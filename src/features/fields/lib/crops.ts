@@ -8,7 +8,10 @@ export const crops: Partial<
   carrot: { cost: 5, duration: 12, yield: 3, repeat: 0 },
   corn: { cost: 9, duration: 18, yield: 4, repeat: 1 },
   berry: { cost: 12, duration: 24, yield: 3, repeat: 2 },
+  wood: { cost: 7, duration: 20, yield: 5, repeat: 2 },
+  fiber: { cost: 6, duration: 16, yield: 4, repeat: 2 },
 };
+export const seedItems: Item[] = ["carrot", "corn", "berry", "wood", "fiber"];
 export function grow(crop: Crop, weather: Weather, hours: number) {
   const water = Math.max(
     0,

@@ -103,10 +103,16 @@ function reset() {
           <WarehousePanel
             v-if="tab === 'warehouse'"
             :batches="warehouse.state.batches"
+            :crates="warehouse.state.crates"
             :hour="clock.state.hour"
             :free="warehouse.free"
             :wasted="warehouse.state.wasted"
+            :stats="warehouse.stats()"
             @sell="farm.sell"
+            @pack="farm.pack"
+            @unpack="farm.unpack"
+            @salvage="farm.salvage"
+            @repair="farm.repair"
           /><WorkshopPanel
             v-if="tab === 'workshop'"
             :jobs="workshop.state.jobs"
@@ -124,7 +130,7 @@ function reset() {
           <div class="tip-card">
             <span>✦ 今日小贴士</span>
             <p>
-              雨天不用浇水，可以留些时间给工坊。<br />蓝莓能连续收获三次，记得照顾它。
+              雨天不用浇水，可以留些时间给工坊。<br />木材与纤维能做成周转箱；整箱订单签收后，客户会返还空箱。
             </p>
             <small>跟着季节的节奏，慢慢来就好。</small>
           </div>

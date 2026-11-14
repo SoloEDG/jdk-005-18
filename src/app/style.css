@@ -548,6 +548,7 @@ h1 {
 }
 .seed-list {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
 }
 .seed-list button {
@@ -895,4 +896,83 @@ progress {
   .main-grid aside {
     margin-top: 10px;
   }
+}
+.crate-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: #f3f5e9;
+  border: 1px solid #e5e9d5;
+  border-radius: 5px;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  font-size: 10px;
+  color: #6f7d5e;
+}
+.crate-bar small {
+  font-size: 9px;
+}
+.pack-target {
+  font-size: 9px;
+  padding: 4px 5px;
+  border: 1px solid #d9e0ce;
+  border-radius: 4px;
+  background: #fffdf5;
+  color: #52634a;
+  max-width: 105px;
+}
+.crate-list {
+  border-top: 1px dashed #e2e7d3;
+  margin-top: 14px;
+  padding-top: 10px;
+}
+.crate-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid #f1f2e8;
+}
+.crate-row strong {
+  font-size: 11px;
+}
+.crate-row em {
+  font-style: normal;
+  color: #7f9367;
+  margin-left: 5px;
+}
+.crate-row small {
+  display: block;
+  font-size: 9px;
+  margin-top: 4px;
+  line-height: 1.7;
+}
+.crate-row.broken {
+  opacity: 0.72;
+  background: #fdf1ec;
+}
+.crate-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 4px;
+}
+.crate-actions button {
+  font-size: 9px;
+  padding: 5px 8px;
+}
+.recipe-group-label {
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: #9aa58a;
+  margin: 4px 0 8px;
+}
+.recipe-list.crate-recipes button {
+  width: 33.33%;
+}
+.recipe-list.crate-recipes b {
+  font-size: 22px;
+}
+.crate-tag {
+  color: #8a7a4e !important;
 }

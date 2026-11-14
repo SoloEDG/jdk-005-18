@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Item, Plot } from "../../../shared/contracts";
 import { items } from "../../../shared/catalog";
-import { crops, ready } from "../lib/crops";
+import { crops, ready, seedItems } from "../lib/crops";
 defineProps<{
   plots: readonly Readonly<Plot>[];
   selected: Item;
@@ -13,7 +13,7 @@ defineEmits<{
   water: [id: number];
   harvest: [id: number];
 }>();
-const seeds: Item[] = ["carrot", "corn", "berry"];
+const seeds = seedItems;
 </script>
 <template>
   <section class="panel seed-panel">

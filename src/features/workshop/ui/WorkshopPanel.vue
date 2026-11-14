@@ -1,10 +1,22 @@
 <script setup lang="ts">
 import type { Job } from "../../../shared/contracts";
 import { items } from "../../../shared/catalog";
-import { recipes, recipeById } from "../lib/recipes";
+import { crateKinds } from "../../../shared/crates";
+import { craftRecipes, crateRecipes, recipeById } from "../lib/recipes";
 import { queueProgress } from "../lib/schedule";
-defineProps<{ jobs: readonly Readonly<Job>[]; hour: number }>();
+type JobView = Readonly<Omit<Job, "reservations">> & {
+  readonly reservations?: readonly string[];
+};
+defineProps<{ jobs: readonly JobView[]; hour: number }>();
 defineEmits<{ enqueue: [recipe: string]; claim: [id: string] }>();
+const label = (id: string) => {
+  const r = recipeById(id)!;
+  return r.output === "crate" ? r.name : items[r.output].name;
+};
+const outputIcon = (r: (typeof craftRecipes)[number]) =>
+  r.output === "crate"
+    ? crateKinds.find((k) => k.capacity === r.capacity)?.icon
+    : items[r.output].icon;
 </script>
 <template>
   <section class="panel workshop-panel">
@@ -12,12 +24,33 @@ defineEmits<{ enqueue: [recipe: string]; claim: [id: string] }>();
       <h2>手作工坊</h2>
       <span>单机顺序加工</span>
     </div>
+    <div class="recipe-group-label">食品加工</div>
     <div class="recipe-list">
-      <button v-for="r in recipes" :key="r.id" @click="$emit('enqueue', r.id)">
-        <b>{{ items[r.output].icon }}</b><strong>{{ r.name }}</strong
+      <button
+        v-for="r in craftRecipes"
+        :key="r.id"
+        @click="$emit('enqueue', r.id)"
+      >
+        <b>{{ outputIcon(r) }}</b
+        ><strong>{{ r.name }}</strong
         ><small
           >{{ r.amount }} {{ items[r.input].name }} →
           {{ r.quantity }} 份<br />{{ r.duration }}h · ¥{{ r.cost }}</small
+        ><span>＋ 制作</span>
+      </button>
+    </div>
+    <div class="recipe-group-label">周转木箱</div>
+    <div class="recipe-list crate-recipes">
+      <button
+        v-for="r in crateRecipes"
+        :key="r.id"
+        @click="$emit('enqueue', r.id)"
+      >
+        <b>{{ outputIcon(r) }}</b
+        ><strong>{{ r.name }}</strong
+        ><small
+          >{{ r.amount }} 木材 + {{ r.extraAmount }} 纤维<br />容纳
+          {{ r.capacity }} 份 · {{ r.duration }}h · ¥{{ r.cost }}</small
         ><span>＋ 制作</span>
       </button>
     </div>
@@ -26,8 +59,7 @@ defineEmits<{ enqueue: [recipe: string]; claim: [id: string] }>();
       :key="job.id"
       class="job-row"
     >
-      <span
-        >{{ recipeById(job.recipe)?.name }} <small>{{ job.id }}</small></span
+      <span>{{ label(job.recipe) }} <small>{{ job.id }}</small></span
       ><template v-if="job.status === 'queued'"
         ><progress
           :value="
@@ -41,7 +73,10 @@ defineEmits<{ enqueue: [recipe: string]; claim: [id: string] }>();
         class="primary"
         @click="$emit('claim', job.id)"
       >
-        领取成品 {{ "★".repeat(job.receipt?.quality ?? 1) }}</button
+        {{
+          recipeById(job.recipe)!.output === "crate" ? "领取空箱" : "领取成品"
+        }}
+        {{ "★".repeat(job.receipt?.quality ?? 1) }}</button
       ><small v-else>加工失败</small>
     </div>
     <p v-if="!jobs.some((j) => j.status !== 'claimed')" class="hint">

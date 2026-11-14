@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Order } from "../../../shared/contracts";
 import { items } from "../../../shared/catalog";
+import { crateKindFor } from "../../../shared/crates";
 defineProps<{ orders: readonly Readonly<Order>[]; hour: number }>();
 defineEmits<{
   reserve: [id: string];
@@ -34,6 +35,11 @@ const statusName = {
         ><small
           >{{ order.id }} · {{ statusName[order.status] }} ·
           {{ Math.max(0, order.deadline - hour) }}h</small
+        ><small v-if="order.crate" class="crate-tag"
+          >整箱交付 · {{ crateKindFor(order.crate.capacity).name }}
+          {{ order.crate.capacity }} 份 ×{{
+            order.quantity / order.crate.capacity
+          }} · 返还 {{ order.crate.empties }} 只空箱</small
         >
       </div>
       <b class="reward">¥{{ order.reward }}</b>

@@ -16,7 +16,12 @@ export function createWorkspace() {
   const orders = createOrders(warehouse, notice, clock.state.hour);
   const fields = createFields(orders.spend, warehouse.add, notice);
   const workshop = createWorkshop(
-    { ...warehouse, spend: orders.spend },
+    {
+      ...warehouse,
+      addPacked: warehouse.addPacked,
+      consumeMany: warehouse.consumeMany,
+      spend: orders.spend,
+    },
     notice,
   );
   const engine = createEngine(
@@ -44,6 +49,39 @@ export function createWorkspace() {
     orders,
     engine,
     notices,
+    pack(crateId: string, batchId: string, n: number | "fill") {
+      const crate = warehouse.state.crates.find((c) => c.id === crateId);
+      const batch = warehouse.state.batches.find((b) => b.id === batchId);
+      if (!crate || !batch) return;
+      const load = crate.contents.reduce((sum, b) => sum + b.quantity, 0);
+      const amount =
+        n === "fill"
+          ? Math.min(crate.capacity - load, warehouse.free(batchId))
+          : n;
+      if (amount < 1) {
+        notice("这只箱子没有空位");
+        return;
+      }
+      if (warehouse.pack(crateId, batchId, amount))
+        notice(`已装箱 ${amount} 份，品质与保质随批保留`);
+      else notice("装箱失败：箱子损坏或份额已被占用");
+    },
+    unpack(crateId: string) {
+      if (warehouse.unpack(crateId)) notice("已拆箱，批次回到散装区");
+      else notice("这只箱子被订单锁定、已损坏或箱内有变质食品，只能拆完好份额");
+    },
+    salvage(crateId: string) {
+      const kept = warehouse.salvage(crateId);
+      notice(
+        kept
+          ? `已拆出完好份额 ${kept} 份，变质部分计入损耗`
+          : "箱内没有可拆出的完好份额",
+      );
+    },
+    repair(crateId: string) {
+      if (warehouse.repair(crateId)) notice("坏箱已修复，可以继续周转");
+      else notice("只有清空的坏箱才能修复");
+    },
     sell(id: string) {
       const item = warehouse.sell(id, 1);
       if (item) {
